@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { BookOpen, Clock, ArrowRight, Star, Code, CreditCard, Cpu, Compass, Terminal, Search, ChevronDown, Award, Heart, Target, Trophy, HandCoins, FileText, MonitorPlay, Gift, Mail, Hash, Globe, Tv, MessageSquare, Box } from 'lucide-react';
 import { courseData } from '../data/mockCourse';
@@ -15,7 +17,20 @@ const SPRING_CONFIG = { stiffness: 160, damping: 18, mass: 1 };
 
 
 export default function Storefront() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [keywordIdx, setKeywordIdx] = useState(0);
+
+  const handleEnrollClick = (e) => {
+    e.preventDefault();
+    if (!user) {
+      navigate('/register');
+    } else if (user.has_purchased) {
+      navigate('/dashboard');
+    } else {
+      navigate('/checkout');
+    }
+  };
 
   const heroX = useMotionValue(0.5);
   const heroY = useMotionValue(0.5);
@@ -81,16 +96,23 @@ export default function Storefront() {
             </p>
 
             <div className="mt-8">
-              <a href="#catalog" className="inline-flex items-center gap-4 bg-white/95 backdrop-blur-xl px-5 py-4 rounded-[24px] shadow-[0_20px_50px_rgba(99,102,241,0.12)] border border-white hover:scale-[1.03] active:scale-95 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+              <button 
+                onClick={handleEnrollClick}
+                className="inline-flex items-center gap-4 bg-white/95 backdrop-blur-xl px-5 py-4 rounded-[24px] shadow-[0_20px_50px_rgba(99,102,241,0.12)] border border-white hover:scale-[1.03] active:scale-95 transition-all duration-300 group cursor-pointer relative overflow-hidden text-left"
+              >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/40 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                 <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 group-hover:rotate-12 transition-transform relative z-10">
                   <CreditCard size={22} className="stroke-[2.5]" />
                 </div>
                 <div className="pr-4 relative z-10">
-                  <h4 className="text-[13px] font-black text-slate-900 tracking-wide uppercase">ENROLL IN THE MASTERCLASS</h4>
-                  <p className="text-[13px] text-slate-500 font-semibold mt-0.5">$99 one-time access - Reg. $199</p>
+                  <h4 className="text-[13px] font-black text-slate-900 tracking-wide uppercase">
+                    {user?.has_purchased ? 'GO TO DASHBOARD' : 'ENROLL IN THE MASTERCLASS'}
+                  </h4>
+                  <p className="text-[13px] text-slate-500 font-semibold mt-0.5">
+                    {user?.has_purchased ? 'Lifetime access unlocked' : '$99 one-time access - Reg. $199'}
+                  </p>
                 </div>
-              </a>
+              </button>
             </div>
 
             <p className="text-[13px] text-slate-500 font-medium leading-relaxed max-w-[280px]">
@@ -495,10 +517,12 @@ export default function Storefront() {
           </div>
           
           <div className="flex flex-col items-center gap-3 z-10">
-            <button className="bg-white text-[#7e60fa] hover:bg-slate-50 transition-colors px-8 py-3.5 rounded-full font-bold text-lg shadow-lg">
-              Start learning now
+            <button 
+              onClick={handleEnrollClick}
+              className="bg-white text-[#7e60fa] hover:bg-slate-50 transition-colors px-8 py-3.5 rounded-full font-bold text-lg shadow-lg cursor-pointer animate-pulse"
+            >
+              {user?.has_purchased ? 'Go to Dashboard' : 'Start learning now'}
             </button>
-            
           </div>
         </div>
 
@@ -541,16 +565,10 @@ export default function Storefront() {
           <div>
             <h4 className="font-bold text-slate-900 mb-4">Legal</h4>
             <ul className="space-y-2.5 font-medium">
-              <li><a href="#" className="hover:text-indigo-600 transition-colors">Legal notice</a></li>
-              <li><a href="#" className="hover:text-indigo-600 transition-colors">General Conditions of Sale and Use</a></li>
+              <li><Link to="/terms" className="hover:text-indigo-600 transition-colors">Terms of Service</Link></li>
+              <li><Link to="/privacy" className="hover:text-indigo-600 transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/refund-policy" className="hover:text-indigo-600 transition-colors">Refund Policy</Link></li>
             </ul>
-            
-            <div className="mt-8">
-              <ul className="space-y-2.5 font-medium">
-                <li><a href="#" className="hover:text-indigo-600 transition-colors">Mentions légales (fr)</a></li>
-                <li><a href="#" className="hover:text-indigo-600 transition-colors">Conditions Générales de Vente et d'Utilisation (fr)</a></li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>

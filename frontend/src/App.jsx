@@ -13,6 +13,11 @@ import Classroom from './pages/Classroom';
 import Dashboard from './pages/Dashboard';
 import Pricing from './pages/Pricing';
 import Settings from './pages/Settings';
+import Checkout from './pages/Checkout';
+import CheckoutSuccess from './pages/CheckoutSuccess';
+import CheckoutCancelled from './pages/CheckoutCancelled';
+import Orders from './pages/Orders';
+import LegalPage from './pages/LegalPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminStudents from './pages/admin/AdminStudents';
 import AdminCurriculum from './pages/admin/AdminCurriculum';
@@ -42,7 +47,7 @@ function ProtectedRoute({ children }) {
 
 function AppContent() {
   const location = useLocation();
-  const hideNavbarRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+  const hideNavbarRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/checkout', '/checkout/success', '/checkout/cancelled'];
   const isAdmin = location.pathname.startsWith('/admin');
   
   return (
@@ -63,11 +68,25 @@ function AppContent() {
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/terms" element={<LegalPage />} />
+              <Route path="/privacy" element={<LegalPage />} />
+              <Route path="/refund-policy" element={<LegalPage />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout/success" element={<CheckoutSuccess />} />
+              <Route path="/checkout/cancelled" element={<CheckoutCancelled />} />
               <Route 
                 path="/dashboard" 
                 element={
                   <ProtectedRoute>
                     <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/dashboard/orders" 
+                element={
+                  <ProtectedRoute>
+                    <Orders />
                   </ProtectedRoute>
                 } 
               />
@@ -81,6 +100,14 @@ function AppContent() {
               />
               <Route 
                 path="/classroom" 
+                element={
+                  <ProtectedRoute>
+                    <Classroom />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/classroom/:lessonId" 
                 element={
                   <ProtectedRoute>
                     <Classroom />

@@ -22,8 +22,11 @@ class SecurityHeaders
         if (method_exists($response, 'header')) {
             $response->header('X-Frame-Options', 'DENY');
             $response->header('X-Content-Type-Options', 'nosniff');
-            $response->header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
             $response->header('X-XSS-Protection', '1; mode=block');
+            // Only set HSTS in production with HTTPS
+            if (app()->environment('production')) {
+                $response->header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+            }
         }
 
         return $response;

@@ -21,13 +21,19 @@ class PasswordResetController extends Controller
     {
         $request->validate(['email' => 'required|email']);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        // Check if user exists first
+        $userExists = \App\Models\User::where('email', $request->email)->exists();
 
-        return $status === Password::RESET_LINK_SENT
-            ? response()->json(['message' => __($status)], 200)
-            : response()->json(['email' => [__($status)]], 422);
+        if ($userExists) {
+            Password::sendResetLink(
+                $request->only('email')
+            );
+        }
+
+        // SECURITY: Return a generic message to prevent user enumeration attacks
+        return response()->json([
+            'message' => 'If that email exists, a reset link has been sent.'
+        ], 200);
     }
 
     /**
@@ -39,6 +45,13 @@ class PasswordResetController extends Controller
             'token' => 'required',
             'email' => 'required|email',
             'password' => 'required|min:8|confirmed',
+        ]);
+
+        \Illuminate\Support\Facades\Log::debug('RESET-PASSWORD attempt', [
+            'email' => $request->email,
+            'token_length' => strlen($request->token ?? ''),
+            'has_password' => !empty($request->password),
+            'has_confirmation' => !empty($request->password_confirmation),
         ]);
 
         $status = Password::reset(
@@ -53,6 +66,11 @@ class PasswordResetController extends Controller
                 event(new PasswordReset($user));
             }
         );
+
+        \Illuminate\Support\Facades\Log::debug('RESET-PASSWORD result', [
+            'status' => $status,
+            'is_reset' => $status === Password::PASSWORD_RESET,
+        ]);
 
         return $status === Password::PASSWORD_RESET
             ? response()->json(['message' => __($status)], 200)

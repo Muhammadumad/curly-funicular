@@ -215,9 +215,9 @@ export default function Navbar() {
                       <BookOpen size={14} />
                       My Courses
                     </Link>
-                    <Link to="/billing" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:text-violet-700 hover:bg-violet-50 rounded-xl transition-colors">
+                    <Link to="/dashboard/orders" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:text-violet-700 hover:bg-violet-50 rounded-xl transition-colors">
                       <CreditCard size={14} />
-                      Billing & Payment
+                      Billing & Invoices
                     </Link>
                     <Link to="/settings" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:text-violet-700 hover:bg-violet-50 rounded-xl transition-colors">
                       <Settings size={14} />

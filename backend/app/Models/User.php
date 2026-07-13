@@ -25,6 +25,8 @@ class User extends Authenticatable
         'password',
         'role',
         'is_suspended',
+        'is_active',
+        'enrolled_at',
     ];
 
     /**
@@ -48,8 +50,19 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_suspended' => 'boolean',
+            'is_active' => 'boolean',
+            'enrolled_at' => 'datetime',
         ];
     }
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'has_purchased',
+    ];
 
     /**
      * Get all activity logs for this user.
@@ -57,6 +70,25 @@ class User extends Authenticatable
     public function activityLogs(): HasMany
     {
         return $this->hasMany(ActivityLog::class);
+    }
+
+    /**
+     * Get all orders for this user.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Attribute to check if user has purchased the masterclass or is an admin.
+     */
+    public function getHasPurchasedAttribute(): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+        return $this->is_active || $this->orders()->where('status', 'paid')->exists();
     }
 
     /**

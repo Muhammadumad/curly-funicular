@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Check, Minus, Plus } from 'lucide-react';
@@ -50,7 +52,27 @@ const PLANS = [
 ];
 
 export default function Pricing() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState('Annual');
+
+  const handlePlanClick = (planName) => {
+    if (planName === 'Free') {
+      if (!user) {
+        navigate('/register');
+      } else {
+        navigate('/dashboard');
+      }
+    } else {
+      if (!user) {
+        navigate('/register');
+      } else if (user.has_purchased) {
+        navigate('/dashboard');
+      } else {
+        navigate('/checkout');
+      }
+    }
+  };
 
   // --- CONFETTI & FIREWORKS ENGINE ---
   const triggerConfetti = (isMassive = false) => {
@@ -165,7 +187,7 @@ export default function Pricing() {
 
               <div className="relative z-10 mt-6">
                 <button 
-                  onClick={() => triggerConfetti(true)}
+                  onClick={() => handlePlanClick(plan.name)}
                   className={`w-full py-4 rounded-2xl text-xs font-extrabold tracking-wider uppercase transition-all shadow-md hover:shadow-xl cursor-pointer ${plan.popular ? 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white hover:scale-[1.02]' : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-50'}`}
                 >
                   {plan.buttonText}

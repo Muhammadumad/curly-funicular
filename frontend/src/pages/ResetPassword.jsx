@@ -46,9 +46,14 @@ export default function ResetPassword() {
         setIsSuccess(true);
       }
     } catch (err) {
+      console.error('RESET ERROR:', err.response?.status, err.response?.data, err.message);
       if (err.response?.data?.errors) {
         const errors = Object.values(err.response.data.errors).flat();
         setError(errors.join(' '));
+      } else if (err.response?.data?.email) {
+        // Backend returns { email: ["message"] } for reset failures
+        const msgs = Array.isArray(err.response.data.email) ? err.response.data.email : [err.response.data.email];
+        setError(msgs.join(' '));
       } else if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {

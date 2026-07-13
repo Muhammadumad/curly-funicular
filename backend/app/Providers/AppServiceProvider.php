@@ -14,7 +14,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            \App\Services\Payments\PaymentGatewayInterface::class,
+            \App\Services\Payments\PaddleGateway::class
+        );
     }
 
     /**
@@ -33,5 +36,22 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
             return env('FRONTEND_URL', 'http://localhost:5173') . '/reset-password?token=' . $token . '&email=' . urlencode($notifiable->getEmailForPasswordReset());
         });
+
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\UserEnrolledInMasterclass::class,
+            \App\Listeners\ProvisionStudentAccount::class
+        );
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\UserEnrolledInMasterclass::class,
+            \App\Listeners\GenerateAndSendInvoice::class
+        );
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\UserEnrolledInMasterclass::class,
+            \App\Listeners\DispatchWelcomeSequence::class
+        );
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\UserEnrolledInMasterclass::class,
+            \App\Listeners\NotifyCommunityWebhook::class
+        );
     }
 }

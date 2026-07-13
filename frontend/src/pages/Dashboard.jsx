@@ -208,6 +208,60 @@ export default function Dashboard() {
     return <Navigate to="/admin" replace />;
   }
 
+  const isActive = user?.is_active;
+
+  if (!isActive) {
+    return (
+      <div className="relative min-h-screen text-slate-900 pb-20 font-sans select-none z-10 overflow-hidden">
+        <main className="relative max-w-3xl mx-auto px-6 pt-32 z-10">
+          <div className="bg-white/40 backdrop-blur-xl border border-slate-200/60 rounded-[32px] p-8 sm:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.05)] text-center relative overflow-hidden">
+            {/* Ambient subtle glow background */}
+            <div className="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="w-20 h-20 bg-amber-500/10 border border-amber-500/20 text-amber-600 rounded-[24px] flex items-center justify-center mx-auto shadow-inner mb-8">
+              <Clock size={38} className="animate-pulse" />
+            </div>
+
+            <span className="text-[10px] font-mono font-black uppercase tracking-widest bg-amber-500/10 text-amber-700 px-3.5 py-1.5 rounded-full border border-amber-500/20 shadow-inner">
+              Payment Pending / Inactive Enrollment
+            </span>
+
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-6 leading-tight">
+              Unlock Your AI Engineering Workspace
+            </h1>
+            
+            <p className="text-sm text-slate-500 font-medium leading-relaxed max-w-lg mx-auto mt-4">
+              We received your authentication handshake, but your seat in the masterclass is currently inactive. Complete your enrollment to unlock the 28-day course modules, sandboxes, and telemetry logs.
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10">
+              <button 
+                onClick={() => navigate('/pricing')}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-8 py-4 rounded-2xl text-xs transition-all shadow-lg hover:scale-102 active:scale-98 cursor-pointer"
+              >
+                View Enrollment Plans
+              </button>
+              <button 
+                onClick={() => window.location.reload()}
+                className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold px-8 py-4 rounded-2xl text-xs transition-all cursor-pointer shadow-sm"
+              >
+                Refresh Account Status
+              </button>
+            </div>
+            
+            <div className="mt-12 pt-8 border-t border-slate-100 flex items-center justify-center gap-3 text-[11px] text-slate-400 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+              Secure connection verified
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+              Stripe financial protection active
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   const tabs = ['Overview', 'Enrollments', 'Certificates'];
 
   const handleTabSwitch = (tab) => {
@@ -409,10 +463,16 @@ export default function Dashboard() {
                   </div>
                   <h3 className="text-xl font-bold text-slate-900">Your Enrollment</h3>
                   <p className="text-sm text-slate-500 max-w-md mx-auto">You are enrolled in the {course?.title}. Complete all {(course?.modules || []).flatMap(m => m.lessons || []).length} lessons across {(course?.modules || []).length} modules to earn your certificate.</p>
-                  <button onClick={() => navigate('/classroom')} className="mt-4 inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-xs transition-colors shadow-lg cursor-pointer">
-                    <Play size={14} />
-                    Continue Learning
-                  </button>
+                  <div className="flex justify-center gap-4 mt-4">
+                    <button onClick={() => navigate('/classroom')} className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-xs transition-colors shadow-lg cursor-pointer">
+                      <Play size={14} />
+                      Continue Learning
+                    </button>
+                    <button onClick={() => navigate('/dashboard/orders')} className="inline-flex items-center gap-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold px-6 py-3 rounded-xl text-xs transition-all cursor-pointer">
+                      <FileText size={14} />
+                      Billing & Invoices
+                    </button>
+                  </div>
                 </div>
               )}
 

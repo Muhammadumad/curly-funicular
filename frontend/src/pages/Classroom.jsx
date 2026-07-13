@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import confetti from 'canvas-confetti';
@@ -48,6 +48,13 @@ function getAllLessons(modules) {
 
 export default function Classroom() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { lessonId } = useParams();
+
+  // Route protection: redirect inactive users to dashboard
+  if (user && !user.is_active) {
+    return <Navigate to="/dashboard" replace />;
+  }
   const [course, setCourse] = useState(null);
   const [currentLesson, setCurrentLesson] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -106,6 +113,10 @@ export default function Classroom() {
       
       const allLessons = getAllLessons(updatedModules);
       setCurrentLesson(prev => {
+        if (lessonId) {
+          const match = allLessons.find(l => String(l.id) === String(lessonId));
+          if (match) return match;
+        }
         if (!prev) return allLessons[0];
         return allLessons.find(l => l.id === prev.id) || allLessons[0];
       });
@@ -130,6 +141,20 @@ export default function Classroom() {
     fetchCourseDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  useEffect(() => {
+    if (course && lessonId) {
+      const allLessons = getAllLessons(course.modules);
+      const match = allLessons.find(l => String(l.id) === String(lessonId));
+      if (match && (!currentLesson || currentLesson.id !== match.id)) {
+        setCurrentLesson(match);
+        const parentModule = course.modules.find(m => m.lessons.some(l => String(l.id) === String(lessonId)));
+        if (parentModule) {
+          setExpandedModules(prev => ({ ...prev, [parentModule.id]: true }));
+        }
+      }
+    }
+  }, [lessonId, course]);
 
   useEffect(() => {
     if (!currentLesson) return;
@@ -423,7 +448,10 @@ export default function Classroom() {
                             </button>
 
                             <button
-                              onClick={() => setCurrentLesson(lesson)}
+                              onClick={() => {
+                                setCurrentLesson(lesson);
+                                navigate(`/classroom/${lesson.id}`);
+                              }}
                               className="text-left flex-1 min-w-0 cursor-pointer"
                             >
                               <p className={`text-xs font-bold tracking-wide truncate ${isActive ? 'text-indigo-900' : 'text-slate-600 group-hover:text-slate-900'}`}>

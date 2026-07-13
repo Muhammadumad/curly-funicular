@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://127.0.0.1:8000', // Ensure this matches your active 'artisan serve' address
+    baseURL: typeof window !== 'undefined'
+        ? `${window.location.protocol}//${window.location.hostname}:8000`
+        : 'http://127.0.0.1:8000',
     withCredentials: true,
     withXSRFToken: true,
     headers: {

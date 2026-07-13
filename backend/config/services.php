@@ -35,4 +35,20 @@ return [
         ],
     ],
 
+    'paddle' => [
+        'api_key' => env('PADDLE_API_KEY'),
+        'webhook_secret' => env('PADDLE_WEBHOOK_SECRET'),
+        'env' => env('PADDLE_ENV', 'sandbox'),
+        'vendor_id' => env('PADDLE_VENDOR_ID'),
+    ],
+
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+
+    'discord' => [
+        'webhook_url' => env('DISCORD_WEBHOOK_URL'),
+    ],
+
 ];

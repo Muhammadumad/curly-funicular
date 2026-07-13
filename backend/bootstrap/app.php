@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->statefulApi();
+        $middleware->validateCsrfTokens(except: [
+            'api/webhooks/paddle',
+            'api/reset-password',
+            'api/webhooks/stripe',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
