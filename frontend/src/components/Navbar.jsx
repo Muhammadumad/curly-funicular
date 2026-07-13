@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { Terminal, User, Menu, X, LayoutList, CreditCard, Search, LogOut, Settings, BookOpen, MoreHorizontal, LayoutDashboard, Code, PenTool, Play } from 'lucide-react';
+import { Terminal, User, Menu, X, LayoutList, CreditCard, Search, LogOut, Settings, BookOpen, MoreHorizontal, LayoutDashboard, Code, PenTool, Play, Shield } from 'lucide-react';
 
 const AVATAR_COLORS = [
   'bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-green-500', 
@@ -204,8 +204,14 @@ export default function Navbar() {
                   </div>
                   
                   <div className="p-2 flex flex-col gap-1">
+                    {user?.role === 'admin' && (
+                      <Link to="/admin" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-xl transition-colors">
+                        <Shield size={14} />
+                        Admin Portal
+                      </Link>
+                    )}
 
-                    <Link to="/my-courses" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:text-violet-700 hover:bg-violet-50 rounded-xl transition-colors">
+                    <Link to="/classroom" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:text-violet-700 hover:bg-violet-50 rounded-xl transition-colors">
                       <BookOpen size={14} />
                       My Courses
                     </Link>
@@ -278,6 +284,16 @@ export default function Navbar() {
           <div className="h-[1px] bg-slate-200/80 my-2" />
           {user ? (
             <div className="flex flex-col gap-2 pt-1">
+              {user?.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between text-xs font-bold text-indigo-950 py-3.5 px-4 rounded-2xl bg-indigo-50 border border-indigo-200"
+                >
+                  <span>Admin Portal</span>
+                  <Shield size={16} className="text-indigo-600" />
+                </Link>
+              )}
               <Link
                 to="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}

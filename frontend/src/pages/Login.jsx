@@ -80,9 +80,9 @@ export default function Login() {
                 <label htmlFor="password" className="block text-[10px] uppercase tracking-widest font-bold text-slate-600">
                   Password
                 </label>
-                <a href="#forgot" onClick={(e) => e.preventDefault()} className="text-[10px] text-indigo-500 hover:text-indigo-600 transition-colors font-semibold">
+                <Link to="/forgot-password" className="text-[10px] text-indigo-500 hover:text-indigo-600 transition-colors font-semibold">
                   Forgot?
-                </a>
+                </Link>
               </div>
               <div className="relative flex items-center group">
                 <Lock size={16} className="absolute left-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />

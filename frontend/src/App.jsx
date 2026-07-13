@@ -2,13 +2,21 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import TechBackground from './components/TechBackground';
+import AdminGuard from './components/AdminGuard';
+import AdminLayout from './components/AdminLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Storefront from './pages/Storefront';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Classroom from './pages/Classroom';
 import Dashboard from './pages/Dashboard';
 import Pricing from './pages/Pricing';
 import Settings from './pages/Settings';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminStudents from './pages/admin/AdminStudents';
+import AdminCurriculum from './pages/admin/AdminCurriculum';
+import AdminSettings from './pages/admin/AdminSettings';
 
 // Route Guard component
 function ProtectedRoute({ children }) {
@@ -34,18 +42,18 @@ function ProtectedRoute({ children }) {
 
 function AppContent() {
   const location = useLocation();
-  const hideNavbarRoutes = ['/login', '/register'];
-  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+  const hideNavbarRoutes = ['/login', '/register', '/forgot-password', '/reset-password'];
+  const isAdmin = location.pathname.startsWith('/admin');
   
   return (
-    <div className={`relative min-h-screen antialiased overflow-x-hidden selection:bg-indigo-500/15 selection:text-indigo-950 bg-[#f8fafc] text-slate-800`}>
+    <div className={`relative min-h-screen antialiased overflow-x-hidden ${isAdmin ? 'bg-slate-950 text-slate-100' : 'selection:bg-indigo-500/15 selection:text-indigo-950 bg-[#f8fafc] text-slate-800'}`}>
         
         {/* --- GLOBAL DYNAMIC TECH & CYBER BACKGROUND --- */}
-        <TechBackground variant="light" />
+        {!isAdmin && <TechBackground variant="light" />}
 
         {/* Core Foreground Content Stack */}
         <div className="relative z-10 flex flex-col min-h-screen pointer-events-auto">
-          {shouldShowNavbar && <Navbar />}
+          {!isAdmin && !hideNavbarRoutes.includes(location.pathname) && <Navbar />}
           
           <main className="flex-1 flex flex-col">
             <Routes>
@@ -53,6 +61,8 @@ function AppContent() {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route 
                 path="/dashboard" 
                 element={
@@ -77,6 +87,19 @@ function AppContent() {
                   </ProtectedRoute>
                 } 
               />
+              <Route
+                path="/admin"
+                element={
+                  <AdminGuard>
+                    <AdminLayout />
+                  </AdminGuard>
+                }
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="students" element={<AdminStudents />} />
+                <Route path="curriculum" element={<AdminCurriculum />} />
+                <Route path="settings" element={<AdminSettings />} />
+              </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

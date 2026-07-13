@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -22,7 +22,6 @@ const MODULE_COLORS = [
   { iconColor: 'text-amber-600', iconBg: 'bg-amber-500', image: 'bg-amber-950', glow: 'shadow-amber-500/20' },
 ];
 
-// --- NEW: Interactive 3D Holographic Brain/Core SVG ---
 function HolographicAICore() {
   return (
     <div className="absolute right-6 top-1/2 -translate-y-1/2 w-48 h-48 pointer-events-none hidden sm:flex items-center justify-center opacity-80 group-hover:scale-110 transition-transform duration-700">
@@ -33,15 +32,11 @@ function HolographicAICore() {
             <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
           </radialGradient>
         </defs>
-        {/* Background Glow */}
         <circle cx="100" cy="100" r="80" fill="url(#holoGrad)" />
-        {/* Wireframe Polyhedron Nodes */}
         <polygon points="100,20 170,70 140,160 60,160 30,70" fill="none" stroke="#818cf8" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.6" />
         <polygon points="100,180 30,130 60,40 140,40 170,130" fill="none" stroke="#38bdf8" strokeWidth="1" opacity="0.4" />
-        {/* Inner Core Rings */}
         <circle cx="100" cy="100" r="45" fill="none" stroke="#c084fc" strokeWidth="2" strokeDasharray="20 10" />
         <circle cx="100" cy="100" r="25" fill="#6366f1" className="animate-pulse" opacity="0.7" />
-        {/* Connecting Data Dots */}
         <circle cx="100" cy="20" r="4" fill="#38bdf8" />
         <circle cx="170" cy="70" r="4" fill="#38bdf8" />
         <circle cx="140" cy="160" r="4" fill="#38bdf8" />
@@ -78,7 +73,6 @@ function CircularDial({ value, max = 100, label, icon: Icon, color, glowClass, u
 
   return (
     <div className="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex items-center gap-5 group relative overflow-hidden">
-      {/* NEW: Subtle Ambient Grid behind Dials */}
       <div className="absolute inset-0 bg-[radial-gradient(#6366f115_1px,transparent_1px)] [background-size:12px_12px] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
       <div className={`relative w-24 h-24 flex items-center justify-center shrink-0 ${glowClass}`}>
@@ -163,10 +157,41 @@ function SkeletonShimmer() {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const progressKey = user ? `lms_progress_${user.id}` : 'lms_progress_guest';
+
+  // Initialize completed lessons directly from localStorage to prevent set-state-in-effect issues
+  const [completedLessons, setCompletedLessons] = useState(() => {
+    try {
+      const stored = localStorage.getItem(progressKey);
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  });
+
   const [activeTab, setActiveTab] = useState('Overview');
   const [isTabLoading, setIsTabLoading] = useState(false);
+
+  // Sync state if progressKey changes (e.g. logging in as a different user)
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(progressKey);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCompletedLessons(stored ? JSON.parse(stored) : []);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [progressKey]);
+
+  // Redirect admin to the proper admin portal - placed after hooks to follow Rules of Hooks
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
   const tabs = ['Overview', 'Enrollments', 'Certificates'];
-  const navigate = useNavigate();
 
   const handleTabSwitch = (tab) => {
     if (tab === activeTab) return;
@@ -185,6 +210,13 @@ export default function Dashboard() {
       colors: ['#4f46e5', '#9333ea', '#06b6d4', '#ec4899']
     });
   };
+
+  // Stats calculation
+  const completedCount = completedLessons.length;
+  const learningHours = Math.round(completedCount * 0.5 * 10) / 10;
+  const conceptsMastered = completedCount;
+  const lessonsComplete = completedCount;
+  const projectsBuilt = Math.floor(completedCount / 6);
 
   return (
     <div className="relative min-h-screen text-slate-900 pb-20 font-sans select-none z-10 overflow-hidden">
@@ -242,19 +274,17 @@ export default function Dashboard() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <CircularDial value={24} max={50} label="Learning Hours" unit="hrs" icon={Clock} color="text-blue-600" glowClass="dial-glow-blue" />
-                      <CircularDial value={18} max={30} label="Concepts Mastered" icon={FileText} color="text-emerald-600" glowClass="dial-glow-green" />
-                      <CircularDial value={12} max={20} label="Lessons Complete" icon={Briefcase} color="text-orange-500" glowClass="dial-glow-orange" />
-                      <CircularDial value={4} max={5} label="Projects Built" icon={Award} color="text-purple-600" glowClass="dial-glow-purple" />
+                      <CircularDial value={learningHours} max={15} label="Learning Hours" unit="hrs" icon={Clock} color="text-blue-600" glowClass="dial-glow-blue" />
+                      <CircularDial value={conceptsMastered} max={29} label="Concepts Mastered" icon={FileText} color="text-emerald-600" glowClass="dial-glow-green" />
+                      <CircularDial value={lessonsComplete} max={29} label="Lessons Complete" icon={Briefcase} color="text-orange-500" glowClass="dial-glow-orange" />
+                      <CircularDial value={projectsBuilt} max={4} label="Projects Built" icon={Award} color="text-purple-600" glowClass="dial-glow-purple" />
                     </div>
                   </div>
 
-                  {/* Hero Banner & Help Center with 3D Core */}
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
                     <div className="lg:col-span-2 bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 text-white rounded-[32px] p-10 sm:p-14 flex flex-col justify-between relative overflow-hidden shadow-xl group">
                       <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl transform translate-x-1/3 -translate-y-1/3 group-hover:scale-110 transition-transform duration-700" />
                       
-                      {/* NEW: Interactive Holographic AI Core */}
                       <HolographicAICore />
 
                       <div className="relative z-10 max-w-md space-y-4">
@@ -307,7 +337,7 @@ export default function Dashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       {courseData.modules.map((mod, i) => {
                         const colors = MODULE_COLORS[i % MODULE_COLORS.length];
-                        const completed = mod.lessons.filter(l => l.isCompleted).length;
+                        const completed = mod.lessons.filter(l => completedLessons.includes(l.id)).length;
                         const total = mod.lessons.length;
                         const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -362,7 +392,11 @@ export default function Dashboard() {
                     <Award size={28} />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900">Verified Engineering Credentials</h3>
-                  <p className="text-sm text-slate-500 max-w-md mx-auto">Complete your remaining 6 modules in the AI Agent Engineering track to generate your cryptographically signed diploma.</p>
+                  <p className="text-sm text-slate-500 max-w-md mx-auto">
+                    {completedCount === 29 
+                      ? "Congratulations! You have completed all lessons. You can now generate your certificate."
+                      : `Complete your remaining ${29 - completedCount} lessons in the AI Agent Engineering track to generate your cryptographically signed diploma.`}
+                  </p>
                 </div>
               )}
             </motion.div>

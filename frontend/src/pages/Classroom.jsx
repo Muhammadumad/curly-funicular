@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import confetti from 'canvas-confetti';
 import { ChevronLeft, ChevronDown, Clock, Check, Sparkles } from 'lucide-react';
@@ -47,6 +48,7 @@ function getAllLessons(modules) {
 }
 
 export default function Classroom() {
+  const { user } = useAuth();
   const [course, setCourse] = useState(null);
   const [currentLesson, setCurrentLesson] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -74,12 +76,32 @@ export default function Classroom() {
     try {
       // Simulate network delay to show loading skeleton
       setTimeout(() => {
-        setCourse(courseData);
-        const allLessons = getAllLessons(courseData.modules);
+        const progressKey = user ? `lms_progress_${user.id}` : 'lms_progress_guest';
+        const stored = localStorage.getItem(progressKey);
+        const completedIds = stored ? JSON.parse(stored) : [];
+
+        // Map courseData modules and lessons to include their localStorage completion status
+        const updatedModules = courseData.modules.map(mod => ({
+          ...mod,
+          lessons: mod.lessons.map(les => ({
+            ...les,
+            isCompleted: completedIds.includes(les.id),
+          }))
+        }));
+
+        const updatedCourse = {
+          ...courseData,
+          modules: updatedModules,
+        };
+
+        setCourse(updatedCourse);
+        
+        const allLessons = getAllLessons(updatedModules);
         setCurrentLesson(prev => {
           if (!prev) return allLessons[0];
           return allLessons.find(l => l.id === prev.id) || prev;
         });
+
         // Auto-expand all modules on first load
         const expanded = {};
         courseData.modules.forEach(m => { expanded[m.id] = true; });
@@ -96,13 +118,12 @@ export default function Classroom() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
-    const load = async () => {
-      await fetchCourseDetails();
-    };
-    load();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchCourseDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (!currentLesson) return;
@@ -149,6 +170,20 @@ export default function Classroom() {
         watch_time_seconds: 0,
         status: newStatus,
       });
+
+      // Update localStorage progress
+      const progressKey = user ? `lms_progress_${user.id}` : 'lms_progress_guest';
+      const stored = localStorage.getItem(progressKey);
+      let completedIds = stored ? JSON.parse(stored) : [];
+      if (currentCompleted) {
+        completedIds = completedIds.filter(id => id !== lesson.id);
+      } else {
+        if (!completedIds.includes(lesson.id)) {
+          completedIds.push(lesson.id);
+        }
+      }
+      localStorage.setItem(progressKey, JSON.stringify(completedIds));
+
       fetchCourseDetails();
     } catch (err) {
       console.error('Failed to toggle completion status', err);
@@ -166,6 +201,16 @@ export default function Classroom() {
           status: 'completed',
         });
         setWatchTimeCounter(0);
+
+        // Update localStorage progress
+        const progressKey = user ? `lms_progress_${user.id}` : 'lms_progress_guest';
+        const stored = localStorage.getItem(progressKey);
+        let completedIds = stored ? JSON.parse(stored) : [];
+        if (!completedIds.includes(currentLesson.id)) {
+          completedIds.push(currentLesson.id);
+          localStorage.setItem(progressKey, JSON.stringify(completedIds));
+        }
+
         fetchCourseDetails();
       } catch (err) {
         console.error('Failed to log final completion', err);
