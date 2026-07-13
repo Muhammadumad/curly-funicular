@@ -11,7 +11,7 @@ class Lesson extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['course_id', 'title', 'video_url', 'duration_in_seconds', 'order_sequence'];
+    protected $fillable = ['course_id', 'module_id', 'title', 'video_url', 'duration_in_seconds', 'order_sequence'];
 
     /**
      * Get the parent course this lesson belongs to.
@@ -19,6 +19,14 @@ class Lesson extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    /**
+     * Get the parent module this lesson belongs to.
+     */
+    public function module(): BelongsTo
+    {
+        return $this->belongsTo(Module::class);
     }
 
     /**

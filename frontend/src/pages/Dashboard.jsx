@@ -3,7 +3,8 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { courseData } from '../data/mockCourse';
+import api from '../services/api';
+
 import { 
   Clock, 
   HelpCircle, 
@@ -172,6 +173,8 @@ export default function Dashboard() {
     }
   });
 
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Overview');
   const [isTabLoading, setIsTabLoading] = useState(false);
 
@@ -185,6 +188,20 @@ export default function Dashboard() {
       console.error(e);
     }
   }, [progressKey]);
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        const res = await api.get('/api/courses/28-day-ai-challenge');
+        setCourse(res.data);
+      } catch (err) {
+        console.error('Failed to fetch course for dashboard', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourse();
+  }, []);
 
   // Redirect admin to the proper admin portal - placed after hooks to follow Rules of Hooks
   if (user?.role === 'admin') {
@@ -217,6 +234,19 @@ export default function Dashboard() {
   const conceptsMastered = completedCount;
   const lessonsComplete = completedCount;
   const projectsBuilt = Math.floor(completedCount / 6);
+
+  if (loading) {
+    return (
+      <div className="relative min-h-screen text-slate-900 pb-20 font-sans select-none z-10 overflow-hidden">
+        <main className="relative max-w-7xl mx-auto px-6 pt-32 z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div className="w-64 h-8 bg-slate-200/70 rounded-lg animate-pulse" />
+          </div>
+          <SkeletonShimmer />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen text-slate-900 pb-20 font-sans select-none z-10 overflow-hidden">
@@ -335,10 +365,10 @@ export default function Dashboard() {
                   <div>
                     <h2 className="text-xl font-extrabold text-slate-900 mb-6 tracking-tight">Course Modules</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      {courseData.modules.map((mod, i) => {
+                      {(course?.modules || []).map((mod, i) => {
                         const colors = MODULE_COLORS[i % MODULE_COLORS.length];
-                        const completed = mod.lessons.filter(l => completedLessons.includes(l.id)).length;
-                        const total = mod.lessons.length;
+                        const completed = (mod.lessons || []).filter(l => completedLessons.includes(l.id) || completedLessons.includes(String(l.id))).length;
+                        const total = (mod.lessons || []).length;
                         const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
                         return (
@@ -352,7 +382,7 @@ export default function Dashboard() {
                             <div className="p-5 flex-1 flex flex-col justify-between">
                               <div>
                                 <h3 className={`font-bold text-sm mb-1.5 ${colors.iconColor} leading-tight`}>{mod.title}</h3>
-                                <p className="text-xs text-slate-500 mb-4 font-medium">{mod.lessons.length} lessons · {mod.duration}</p>
+                                <p className="text-xs text-slate-500 mb-4 font-medium">{(mod.lessons || []).length} lessons · {mod.duration}</p>
                               </div>
                               <div className="space-y-3 pt-3 border-t border-slate-100">
                                 <div className="flex items-center justify-between">
@@ -378,7 +408,7 @@ export default function Dashboard() {
                     <Briefcase size={28} />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900">Your Enrollment</h3>
-                  <p className="text-sm text-slate-500 max-w-md mx-auto">You are enrolled in the {courseData.title}. Complete all {courseData.totalLessons} lessons across {courseData.modules.length} modules to earn your certificate.</p>
+                  <p className="text-sm text-slate-500 max-w-md mx-auto">You are enrolled in the {course?.title}. Complete all {(course?.modules || []).flatMap(m => m.lessons || []).length} lessons across {(course?.modules || []).length} modules to earn your certificate.</p>
                   <button onClick={() => navigate('/classroom')} className="mt-4 inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-xs transition-colors shadow-lg cursor-pointer">
                     <Play size={14} />
                     Continue Learning

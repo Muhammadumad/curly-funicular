@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import confetti from 'canvas-confetti';
 import { ChevronLeft, ChevronDown, Clock, Check, Sparkles } from 'lucide-react';
-import { courseData } from '../data/mockCourse';
 
 
 
@@ -74,46 +73,53 @@ export default function Classroom() {
 
   const fetchCourseDetails = async () => {
     try {
-      // Simulate network delay to show loading skeleton
-      setTimeout(() => {
-        const progressKey = user ? `lms_progress_${user.id}` : 'lms_progress_guest';
-        const stored = localStorage.getItem(progressKey);
-        const completedIds = stored ? JSON.parse(stored) : [];
+      const res = await api.get('/api/courses/28-day-ai-challenge');
+      const courseDataFromAPI = res.data;
 
-        // Map courseData modules and lessons to include their localStorage completion status
-        const updatedModules = courseData.modules.map(mod => ({
-          ...mod,
-          lessons: mod.lessons.map(les => ({
+      const progressKey = user ? `lms_progress_${user.id}` : 'lms_progress_guest';
+      const stored = localStorage.getItem(progressKey);
+      const completedIds = stored ? JSON.parse(stored) : [];
+
+      const updatedModules = (courseDataFromAPI.modules || []).map(mod => ({
+        ...mod,
+        lessons: (mod.lessons || []).map(les => {
+          const minutes = Math.floor(les.duration_in_seconds / 60);
+          const seconds = les.duration_in_seconds % 60;
+          const durationStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+          // Mark completed if database status is completed OR locally recorded in localStorage
+          const hasDbCompletion = les.activity_logs?.some(log => log.status === 'completed');
+          return {
             ...les,
-            isCompleted: completedIds.includes(les.id),
-          }))
-        }));
+            duration: durationStr,
+            isCompleted: hasDbCompletion || completedIds.includes(les.id) || completedIds.includes(String(les.id)),
+          };
+        })
+      }));
 
-        const updatedCourse = {
-          ...courseData,
-          modules: updatedModules,
-        };
+      const updatedCourse = {
+        ...courseDataFromAPI,
+        modules: updatedModules,
+      };
 
-        setCourse(updatedCourse);
-        
-        const allLessons = getAllLessons(updatedModules);
-        setCurrentLesson(prev => {
-          if (!prev) return allLessons[0];
-          return allLessons.find(l => l.id === prev.id) || prev;
-        });
+      setCourse(updatedCourse);
+      
+      const allLessons = getAllLessons(updatedModules);
+      setCurrentLesson(prev => {
+        if (!prev) return allLessons[0];
+        return allLessons.find(l => l.id === prev.id) || allLessons[0];
+      });
 
-        // Auto-expand all modules on first load
-        const expanded = {};
-        courseData.modules.forEach(m => { expanded[m.id] = true; });
-        setExpandedModules(prev => {
-          // Only set if empty (first load)
-          if (Object.keys(prev).length === 0) return expanded;
-          return prev;
-        });
-        setLoading(false);
-      }, 800);
-
-    } catch {
+      // Auto-expand all modules on first load
+      const expanded = {};
+      updatedModules.forEach(m => { expanded[m.id] = true; });
+      setExpandedModules(prev => {
+        if (Object.keys(prev).length === 0) return expanded;
+        return prev;
+      });
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
       setError('Course not found or access denied.');
       setLoading(false);
     }

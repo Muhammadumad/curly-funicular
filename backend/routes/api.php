@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\AdminCurriculumController;
 use App\Http\Controllers\Api\StudentManagementController;
 use App\Http\Controllers\Api\PasswordResetController;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,14 @@ Route::middleware('throttle:api')->group(function (): void {
             Route::get('/students', [StudentManagementController::class, 'index']);
             Route::patch('/students/{id}/suspend', [StudentManagementController::class, 'suspend']);
             Route::patch('/students/{id}/unsuspend', [StudentManagementController::class, 'unsuspend']);
+
+            // Curriculum Editor CRUD
+            Route::post('/modules', [AdminCurriculumController::class, 'storeModule']);
+            Route::put('/modules/{id}', [AdminCurriculumController::class, 'updateModule']);
+            Route::delete('/modules/{id}', [AdminCurriculumController::class, 'destroyModule']);
+            Route::post('/lessons', [AdminCurriculumController::class, 'storeLesson']);
+            Route::put('/lessons/{id}', [AdminCurriculumController::class, 'updateLesson']);
+            Route::delete('/lessons/{id}', [AdminCurriculumController::class, 'destroyLesson']);
         });
     });
 });

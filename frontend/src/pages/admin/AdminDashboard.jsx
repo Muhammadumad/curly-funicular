@@ -12,7 +12,7 @@ function StatCard({ label, value, icon: Icon, index }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
-      className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1"
+      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-transparent p-6 transition-all duration-300 hover:-translate-y-1"
     >
       <div className="flex items-start justify-between">
         <div>
@@ -188,7 +188,7 @@ export default function AdminDashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.25, ease: [0.23, 1, 0.32, 1] }}
-        className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-xl"
+        className="rounded-2xl border border-white/10 bg-transparent p-6"
       >
         <h2 className="mb-6 text-[15px] font-bold tracking-tight text-slate-100">
           Recent Sign-ups

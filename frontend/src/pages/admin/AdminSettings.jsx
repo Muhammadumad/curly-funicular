@@ -37,7 +37,7 @@ export default function AdminSettings() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
-          className="md:col-span-8 rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-xl shadow-xs space-y-6"
+          className="md:col-span-8 rounded-2xl border border-white/10 bg-transparent p-6 space-y-6"
         >
           <div className="space-y-4">
             <h3 className="font-bold text-[16px] text-slate-100">Platform Settings</h3>

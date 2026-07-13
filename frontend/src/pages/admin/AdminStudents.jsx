@@ -98,12 +98,12 @@ export default function AdminStudents() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
-        className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-xl shadow-xs"
+        className="rounded-2xl border border-white/10 bg-transparent p-6"
       >
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-white/10">
                 <th className="pb-3 pl-2 font-mono text-xs tracking-widest text-slate-500 uppercase">Student</th>
                 <th className="pb-3 font-mono text-xs tracking-widest text-slate-500 uppercase">Status</th>
                 <th className="pb-3 font-mono text-xs tracking-widest text-slate-500 uppercase">Last Activity</th>

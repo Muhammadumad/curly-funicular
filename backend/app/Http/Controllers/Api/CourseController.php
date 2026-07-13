@@ -32,14 +32,17 @@ class CourseController extends Controller
     public function show(string $slug): JsonResponse
     {
         $relations = [
-            'lessons' => function ($query) {
+            'modules' => function ($query) {
+                $query->orderBy('order_sequence', 'asc');
+            },
+            'modules.lessons' => function ($query) {
                 $query->orderBy('order_sequence', 'asc');
             }
         ];
 
         if (auth('sanctum')->check()) {
             $userId = auth('sanctum')->id();
-            $relations['lessons.activityLogs'] = function ($query) use ($userId) {
+            $relations['modules.lessons.activityLogs'] = function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             };
         }
@@ -75,16 +78,19 @@ class CourseController extends Controller
             ], 404);
         }
 
-        // 1. Total count of lessons mapped to the course
-        $totalLessons = $course->lessons()->count();
+        // 1. Get module IDs for this course
+        $moduleIds = $course->modules()->pluck('id');
 
-        // 2. Count of completed lessons for the authenticated user
+        // 2. Total count of lessons mapped to the course's modules
+        $totalLessons = Lesson::whereIn('module_id', $moduleIds)->count();
+
+        // 3. Count of completed lessons for the authenticated user
         $completedLessons = ActivityLog::where('user_id', $user->id)
-            ->whereIn('lesson_id', $course->lessons()->pluck('id'))
+            ->whereIn('lesson_id', Lesson::whereIn('module_id', $moduleIds)->pluck('id'))
             ->where('status', 'completed')
             ->count();
 
-        // 3. Prevent divide-by-zero, calculate percentage
+        // 4. Prevent divide-by-zero, calculate percentage
         $completionPercentage = $totalLessons > 0
             ? round(($completedLessons / $totalLessons) * 100, 2)
             : 0;
