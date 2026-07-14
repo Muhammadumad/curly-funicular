@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'verify_progress_ping' => \App\Http\Middleware\VerifyProgressPing::class,
         ]);
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->statefulApi();

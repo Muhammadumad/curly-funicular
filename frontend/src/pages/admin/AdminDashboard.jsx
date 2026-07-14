@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
-import { Users, Activity, DollarSign, ArrowUpRight, UserPlus } from 'lucide-react';
+import { Users, Activity, DollarSign, ArrowUpRight, UserPlus, ArrowLeft } from 'lucide-react';
 
 // ──────────────────────────────────────────────
 // Stat Card — translucent dark glassmorphic with hover float
@@ -12,23 +13,23 @@ function StatCard({ label, value, icon: Icon, index }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-transparent p-6 transition-all duration-300 hover:-translate-y-1"
+      className="group relative overflow-hidden rounded-md bg-surface-container-lowest p-6 transition-all duration-300 hover:-translate-y-0.5"
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-500 font-label">
             {label}
           </p>
-          <p className="mt-2 text-4xl font-extrabold tracking-tight text-slate-100">
+          <p className="mt-2 text-4xl font-bold tracking-tight text-slate-900 font-heading">
             {value}
           </p>
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] border border-white/5">
-          <Icon size={20} className="text-slate-400" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-surface-container text-primary">
+          <Icon size={20} />
         </div>
       </div>
 
-      <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-emerald-400/80">
+      <div className="mt-5 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
         <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         <span>+12% this week</span>
       </div>
@@ -43,51 +44,50 @@ function RecentSignupsTable({ signups }) {
   if (!signups || signups.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-slate-500">
-        <UserPlus size={32} className="mb-3 text-slate-600" />
-        <p className="text-sm font-medium">No students have signed up yet.</p>
+        <UserPlus size={32} className="mb-3 text-slate-400" />
+        <p className="text-sm font-medium font-sans">No students have signed up yet.</p>
       </div>
     );
   }
 
-  // Subtle colors for gradient avatars
-  const avatarGradients = [
-    'from-indigo-500/20 to-purple-500/20 text-indigo-300 border-white/5',
-    'from-emerald-500/20 to-teal-500/20 text-emerald-300 border-white/5',
-    'from-pink-500/20 to-rose-500/20 text-pink-300 border-white/5',
-    'from-amber-500/20 to-orange-500/20 text-amber-300 border-white/5',
+  const avatarStyles = [
+    'bg-primary/10 text-primary',
+    'bg-tertiary/10 text-tertiary',
+    'bg-slate-200 text-slate-700',
   ];
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm text-slate-300">
+      <table className="w-full text-left text-sm text-slate-650">
         <thead>
-          <tr className="border-b border-white/5">
-            <th className="pb-3 pl-2 font-mono text-xs tracking-widest text-slate-500 uppercase">Name</th>
-            <th className="pb-3 font-mono text-xs tracking-widest text-slate-500 uppercase">Email</th>
-            <th className="pb-3 pr-2 text-right font-mono text-xs tracking-widest text-slate-500 uppercase">Joined</th>
+          <tr className="border-b border-ghost-border">
+            <th className="pb-3 pl-2 font-label text-xs tracking-widest text-slate-500 uppercase font-bold">Name</th>
+            <th className="pb-3 font-label text-xs tracking-widest text-slate-500 uppercase font-bold">Email</th>
+            <th className="pb-3 pr-2 text-right font-label text-xs tracking-widest text-slate-500 uppercase font-bold">Joined</th>
           </tr>
         </thead>
         <tbody>
           {signups.map((student, i) => {
-            const gradientClass = avatarGradients[i % avatarGradients.length];
+            const avatarClass = avatarStyles[i % avatarStyles.length];
+            const isEven = i % 2 === 0;
             return (
               <motion.tr
                 key={student.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 + i * 0.05, ease: [0.23, 1, 0.32, 1] }}
-                className="border-b border-white/[0.01] transition-all duration-300 hover:bg-white/[0.02]"
+                className={`transition-all duration-300 hover:bg-surface-container ${isEven ? 'bg-surface-container-lowest' : 'bg-surface-container-low'}`}
               >
                 <td className="py-3.5 pl-2">
                   <div className="flex items-center gap-3">
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-tr ${gradientClass} text-xs font-bold border shadow-sm`}>
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-full ${avatarClass} text-xs font-bold font-label`}>
                       {student.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
-                    <span className="font-semibold tracking-wide text-slate-200">{student.name}</span>
+                    <span className="font-bold text-slate-800 font-sans">{student.name}</span>
                   </div>
                 </td>
-                <td className="py-3.5 text-slate-300 font-medium">{student.email}</td>
-                <td className="py-3.5 pr-2 text-right text-slate-400 font-medium">
+                <td className="py-3.5 text-slate-600 font-medium font-sans">{student.email}</td>
+                <td className="py-3.5 pr-2 text-right text-slate-500 font-medium font-label">
                   {new Date(student.created_at).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -137,10 +137,10 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-32 bg-slate-950">
+      <div className="flex items-center justify-center py-32 bg-canvas">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500/20 border-t-indigo-400" />
-          <p className="text-xs font-mono tracking-widest text-slate-500 uppercase">Synchronizing Portal...</p>
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
+          <p className="text-xs font-label tracking-widest text-slate-500 uppercase font-bold">Synchronizing Portal...</p>
         </div>
       </div>
     );
@@ -165,15 +165,25 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 bg-slate-950 min-h-screen">
+    <div className="mx-auto max-w-6xl space-y-8 bg-canvas min-h-screen p-6">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+        className="space-y-4"
       >
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-100">Overview</h1>
-        <p className="mt-1.5 text-sm font-medium text-slate-400">Platform overview and recent activity.</p>
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-primary transition-colors font-label group"
+        >
+          <ArrowLeft size={14} className="transition-transform duration-300 group-hover:-translate-x-1" />
+          <span>Back to Storefront</span>
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 font-heading">Overview</h1>
+          <p className="mt-1.5 text-sm font-medium text-slate-500 font-sans">Platform overview and recent activity.</p>
+        </div>
       </motion.div>
 
       {/* Stat cards grid */}
@@ -188,9 +198,9 @@ export default function AdminDashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.25, ease: [0.23, 1, 0.32, 1] }}
-        className="rounded-2xl border border-white/10 bg-transparent p-6"
+        className="rounded-md bg-surface-container-lowest p-6"
       >
-        <h2 className="mb-6 text-[15px] font-bold tracking-tight text-slate-100">
+        <h2 className="mb-6 text-[15px] font-bold tracking-tight text-slate-900 font-heading">
           Recent Sign-ups
         </h2>
         <RecentSignupsTable signups={stats?.recent_signups} />

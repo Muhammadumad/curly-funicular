@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
-import { BookOpen, Video, Edit2, Save, Loader2 } from 'lucide-react';
+import { BookOpen, Video, Edit2, Save, Loader2, ArrowLeft } from 'lucide-react';
 
 export default function AdminCurriculum() {
   const [course, setCourse] = useState(null);
@@ -85,27 +86,34 @@ export default function AdminCurriculum() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-32 bg-slate-950">
+      <div className="flex items-center justify-center py-32 bg-canvas">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-6 w-6 animate-spin text-indigo-400" />
-          <p className="text-xs font-mono tracking-widest text-slate-500 uppercase">Loading Course Syllabus...</p>
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <p className="text-xs font-label tracking-widest text-slate-500 uppercase font-bold">Loading Course Syllabus...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 bg-slate-950 text-slate-300">
+    <div className="mx-auto max-w-6xl space-y-8 bg-canvas min-h-screen p-6 text-slate-800">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        className="flex flex-col gap-4"
       >
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-primary transition-colors font-label group"
+        >
+          <ArrowLeft size={14} className="transition-transform duration-300 group-hover:-translate-x-1" />
+          <span>Back to Storefront</span>
+        </Link>
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-100">Curriculum</h1>
-          <p className="mt-1.5 text-sm font-medium text-slate-400">Add, edit, and organize lessons inside the 28-day challenge.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 font-heading">Curriculum</h1>
+          <p className="mt-1.5 text-sm font-medium text-slate-500 font-sans">Add, edit, and organize lessons inside the 28-day challenge.</p>
         </div>
       </motion.div>
 
@@ -118,7 +126,7 @@ export default function AdminCurriculum() {
           className="lg:col-span-4 space-y-3"
         >
           <div className="flex items-center justify-between px-1">
-            <span className="font-mono text-xs tracking-widest text-slate-500 uppercase">Modules</span>
+            <span className="font-label text-xs tracking-widest text-slate-500 uppercase font-bold">Modules</span>
           </div>
 
           <div className="space-y-2">
@@ -129,17 +137,17 @@ export default function AdminCurriculum() {
                   setActiveModuleId(mod.id);
                   setEditingLessonId(null);
                 }}
-                className={`w-full flex items-center justify-between rounded-xl p-4 text-left border transition-all duration-300 ${
+                className={`w-full flex items-center justify-between rounded-md p-4 text-left border transition-all duration-300 ${
                   activeModuleId === mod.id
-                    ? 'bg-indigo-500/15 border-indigo-500/20 text-indigo-200 shadow-sm'
-                    : 'bg-white/[0.03] border-white/5 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200'
+                    ? 'bg-primary/10 border-primary/20 text-primary shadow-sm'
+                    : 'bg-surface-container-lowest border-ghost-border text-slate-600 hover:bg-surface-container hover:text-slate-800'
                 }`}
               >
                 <div>
-                  <h3 className="font-bold text-[14px]">{mod.title}</h3>
-                  <p className="text-[11px] font-medium text-slate-500 mt-0.5">{(mod.lessons || []).length} Lessons • {mod.duration || 'N/A'}</p>
+                  <h3 className="font-bold text-[14px] font-sans">{mod.title}</h3>
+                  <p className="text-[11px] font-medium text-slate-500 mt-0.5 font-label">{(mod.lessons || []).length} Lessons • {mod.duration || 'N/A'}</p>
                 </div>
-                <BookOpen size={16} className={activeModuleId === mod.id ? 'text-indigo-300' : 'text-slate-500'} />
+                <BookOpen size={16} className={activeModuleId === mod.id ? 'text-primary' : 'text-slate-400'} />
               </button>
             ))}
           </div>
@@ -155,72 +163,75 @@ export default function AdminCurriculum() {
           {activeModule && (
             <>
               <div className="flex items-center justify-between px-1">
-                <span className="font-mono text-xs tracking-widest text-slate-500 uppercase">{activeModule.title} — Lessons</span>
+                <span className="font-label text-xs tracking-widest text-slate-500 uppercase font-bold">{activeModule.title} — Lessons</span>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-transparent p-6 space-y-3">
+              <div className="rounded-md bg-surface-container-lowest p-6 space-y-3">
                 <AnimatePresence mode="popLayout">
-                  {(activeModule.lessons || []).map((lesson, i) => (
-                    <motion.div
-                      key={lesson.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.4, delay: i * 0.04 }}
-                      className="flex items-center justify-between rounded-xl border border-white/[0.02] bg-white/[0.01] p-4 hover:bg-white/[0.04] transition-all duration-300 group"
-                    >
-                      <div className="flex-1 flex items-center gap-3 pr-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/[0.03] border border-white/5 text-slate-400">
-                          <Video size={16} />
+                  {(activeModule.lessons || []).map((lesson, i) => {
+                    const isEven = i % 2 === 0;
+                    return (
+                      <motion.div
+                        key={lesson.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.4, delay: i * 0.04 }}
+                        className={`flex items-center justify-between rounded-md p-4 transition-all duration-300 group hover:bg-surface-container ${isEven ? 'bg-surface-container-lowest border border-ghost-border' : 'bg-surface-container-low'}`}
+                      >
+                        <div className="flex-1 flex items-center gap-3 pr-4">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 border border-primary/20 text-primary">
+                            <Video size={16} />
+                          </div>
+                          
+                          {editingLessonId === lesson.id ? (
+                            <div className="flex-1 flex flex-col sm:flex-row gap-2">
+                              <input
+                                type="text"
+                                value={lessonTitle}
+                                onChange={(e) => setLessonTitle(e.target.value)}
+                                className="flex-grow rounded-md border border-ghost-border bg-white px-3 py-1 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-primary"
+                              />
+                              <input
+                                type="text"
+                                value={lessonDuration}
+                                onChange={(e) => setLessonDuration(e.target.value)}
+                                className="w-20 rounded-md border border-ghost-border bg-white px-3 py-1 text-sm text-center text-slate-900 placeholder-slate-400 outline-none focus:border-primary"
+                              />
+                            </div>
+                          ) : (
+                            <div>
+                              <h4 className="text-sm font-semibold text-slate-950 font-sans">{lesson.title}</h4>
+                              <p className="text-xs text-slate-500 font-medium mt-0.5 font-label">{lesson.duration}</p>
+                            </div>
+                          )}
                         </div>
-                        
-                        {editingLessonId === lesson.id ? (
-                          <div className="flex-1 flex flex-col sm:flex-row gap-2">
-                            <input
-                              type="text"
-                              value={lessonTitle}
-                              onChange={(e) => setLessonTitle(e.target.value)}
-                              className="flex-grow rounded-lg border border-white/10 bg-slate-900 px-3 py-1 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-indigo-500/50"
-                            />
-                            <input
-                              type="text"
-                              value={lessonDuration}
-                              onChange={(e) => setLessonDuration(e.target.value)}
-                              className="w-20 rounded-lg border border-white/10 bg-slate-900 px-3 py-1 text-sm text-center text-slate-100 placeholder-slate-500 outline-none focus:border-indigo-500/50"
-                            />
-                          </div>
-                        ) : (
-                          <div>
-                            <h4 className="text-sm font-semibold text-slate-200">{lesson.title}</h4>
-                            <p className="text-xs text-slate-400 font-medium mt-0.5">{lesson.duration}</p>
-                          </div>
-                        )}
-                      </div>
 
-                      <div className="flex items-center gap-2">
-                        {editingLessonId === lesson.id ? (
-                          <button
-                            onClick={handleSaveLesson}
-                            disabled={saving}
-                            className="rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 p-2 border border-indigo-500/20 hover:border-indigo-500/30 transition-colors"
-                          >
-                            {saving ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <Save size={14} />
-                            )}
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleEditLesson(lesson)}
-                            className="rounded-lg bg-white/[0.02] hover:bg-white/[0.05] text-slate-400 hover:text-slate-200 p-2 border border-white/5 transition-colors"
-                          >
-                            <Edit2 size={14} />
-                          </button>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
+                        <div className="flex items-center gap-2">
+                          {editingLessonId === lesson.id ? (
+                            <button
+                              onClick={handleSaveLesson}
+                              disabled={saving}
+                              className="rounded-md bg-primary/10 hover:bg-primary/20 text-primary p-2 border border-primary/20 hover:border-primary/30 transition-colors"
+                            >
+                              {saving ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <Save size={14} />
+                              )}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleEditLesson(lesson)}
+                              className="rounded-md bg-surface-container hover:bg-surface-container-high text-slate-500 hover:text-slate-800 p-2 border border-ghost-border transition-colors"
+                            >
+                              <Edit2 size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </AnimatePresence>
               </div>
             </>

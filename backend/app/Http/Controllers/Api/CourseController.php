@@ -102,4 +102,88 @@ class CourseController extends Controller
             'completion_percentage' => $completionPercentage,
         ], 200);
     }
+
+    /**
+     * Get temporary signed stream URL and JWT token for a classroom lesson.
+     */
+    public function getClassroomLesson(int $lessonId, Request $request, \App\Services\Video\VideoStreamingService $streamingService): JsonResponse
+    {
+        $user = $request->user();
+
+        // 1. Authorization check: user must be active (enrolled and paid)
+        if (!$user->is_active) {
+            return response()->json([
+                'message' => 'Access denied. Active enrollment required to watch classroom content.',
+            ], 403);
+        }
+
+        // 2. Fetch the lesson
+        $lesson = \App\Models\Lesson::find($lessonId);
+
+        if (!$lesson) {
+            return response()->json([
+                'message' => 'Lesson not found.',
+            ], 404);
+        }
+
+        // 3. Generate signed stream details
+        $signedDetails = $streamingService->generateSignedStreamUrl($lesson, $user->id);
+
+        return response()->json($signedDetails, 200);
+    }
+
+    /**
+     * Stream endpoint that validates JWT before redirecting to actual stream provider.
+     */
+    public function streamVideo(int $lessonId, Request $request, \App\Services\Video\VideoStreamingService $streamingService): \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+    {
+        $token = $request->query('token');
+
+        if (!$token) {
+            return response()->json(['message' => 'Forbidden. Streaming token required.'], 403);
+        }
+
+        // Validate JWT signature and expiration
+        $payload = \App\Services\Video\JwtTokenGenerator::verify($token, config('app.key'));
+
+        if (!$payload || (int) $payload['lesson_id'] !== $lessonId) {
+            return response()->json(['message' => 'Forbidden. Invalid or expired streaming token.'], 403);
+        }
+
+        $lesson = \App\Models\Lesson::find($lessonId);
+        if (!$lesson) {
+            return response()->json(['message' => 'Lesson not found.'], 404);
+        }
+
+        // Resolve actual HLS target URL
+        $targetUrl = $streamingService->getTargetHlsUrl($lesson);
+
+        // Redirect to provider with permanent redirect to stream (using 302/307 to avoid caching of dynamic signed URL)
+        return redirect()->away($targetUrl, 307);
+    }
+
+    /**
+     * Ask the interactive AI tutor a question about the active lesson.
+     */
+    public function askCopilot(int $lessonId, Request $request, \App\Services\AI\CopilotService $copilotService): JsonResponse
+    {
+        $user = $request->user();
+
+        // 1. Authorization check: user must be active
+        if (!$user->is_active) {
+            return response()->json([
+                'message' => 'Access denied. Active enrollment required to use the AI Copilot.',
+            ], 403);
+        }
+
+        // 2. Validate payload
+        $request->validate([
+            'question' => 'required|string|max:1000',
+        ]);
+
+        // 3. Generate answer and citations via CopilotService
+        $result = $copilotService->ask($lessonId, $request->input('question'));
+
+        return response()->json($result, 200);
+    }
 }

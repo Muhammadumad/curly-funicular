@@ -1,32 +1,36 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Outfit", system-ui, -apple-system, sans-serif;
-  --font-heading: "Outfit", system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-heading: "Sora", sans-serif;
+  --font-label: "Space Grotesk", sans-serif;
   
-  /* System Brand & Crisp Canvas Colors */
-  --color-canvas: #f8fafc;
-  --color-slate-900: #0f172a;
-  --color-slate-800: #1e293b;
-  --color-slate-700: #334155;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   
-  /* Vibrant AETHER / Design+Code Accent Palette */
-  --color-accent-indigo: #4f46e5;
-  --color-accent-purple: #9333ea;
-  --color-accent-pink: #db2777;
-  --color-accent-cyan: #0891b2;
-
-  /* Soft Glass Box Shadows */
-  --shadow-glass: 0 12px 35px 0 rgba(15, 23, 42, 0.06);
-  --shadow-glass-sm: 0 4px 16px 0 rgba(15, 23, 42, 0.04);
-  --shadow-glow-indigo: 0 10px 30px -5px rgba(79, 70, 229, 0.25);
-  --shadow-glow-purple: 0 10px 30px -5px rgba(147, 51, 234, 0.25);
-  --shadow-glow-pink: 0 10px 30px -5px rgba(219, 39, 119, 0.25);
-}
-
-@theme {
-  --font-sans: "Outfit", system-ui, -apple-system, sans-serif;
-  --font-heading: "Outfit", system-ui, -apple-system, sans-serif;
+  /* Cyber-Vibrant Color Tokens */
+  --color-primary: #b6004f;
+  --color-primary-container: #ff7195;
+  
+  --color-tertiary: #6b5b00;
+  
+  /* Surface tiers for hierarchy */
+  --color-canvas: #f8f5ff;
+  --color-surface-dim: #d2d1fa;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2efff;
+  --color-surface-container: #e8e5ff;
+  --color-surface-container-high: #e2dfff;
+  --color-surface-container-highest: #dbd9ff;
+  
+  /* Text colors */
+  --color-slate-900: #2d2d43;
+  --color-slate-800: #45445d;
+  --color-slate-700: #5a5972;
+  
+  /* Border */
+  --color-ghost-border: #acaac6;
 }
 
 /* --- GAMIFICATION & SHIMMER KEYFRAMES --- */
@@ -82,14 +86,14 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  background-color: #f8fafc;
+  background-color: var(--color-canvas);
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #f8fafc;
-  color: #334155;
+  background-color: var(--color-canvas);
+  color: var(--color-slate-900);
   overflow-x: hidden;
 }
 
@@ -138,19 +142,17 @@ body {
 }
 
 .glass-panel {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.65) 100%);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 12px 35px 0 rgba(15, 23, 42, 0.05), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--color-ghost-border);
 }
 
 .glass-nav {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-ghost-border);
 }
 
 /* 3D Perspective Tech Floor Grid */
@@ -174,4 +176,66 @@ body {
 
 .animate-aurora {
   animation: aurora-shift 15s ease-in-out infinite;
+}
+
+/* Alexandria Custom Typography & Component Utilities */
+.font-editorial-heading {
+  font-family: var(--font-heading);
+}
+
+.font-editorial-sans {
+  font-family: var(--font-sans);
+}
+
+.font-editorial-label {
+  font-family: var(--font-label);
+}
+
+.btn-alex-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
+  color: #ffffff;
+  font-family: var(--font-label);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease-in-out;
+  border: none;
+}
+.btn-alex-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-alex-secondary {
+  background-color: var(--color-surface-container-high);
+  color: var(--color-primary);
+  font-family: var(--font-label);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease-in-out;
+}
+.btn-alex-secondary:hover {
+  background-color: var(--color-surface-container-highest);
+}
+
+.btn-alex-tertiary {
+  color: var(--color-primary);
+  font-family: var(--font-label);
+  font-weight: 500;
+  background: transparent;
+  transition: all 0.2s ease-in-out;
+}
+.btn-alex-tertiary:hover {
+  text-decoration: underline;
+}
+
+.input-alex {
+  background-color: #ffffff;
+  border: 1px solid var(--color-ghost-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  transition: all 0.2s ease-in-out;
+}
+.input-alex:focus {
+  border-color: var(--color-primary);
+  outline: none;
 }

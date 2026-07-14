@@ -53,5 +53,28 @@ class AppServiceProvider extends ServiceProvider
             \App\Events\UserEnrolledInMasterclass::class,
             \App\Listeners\NotifyCommunityWebhook::class
         );
+
+        // Laravel 13 Query Builder Macro for Vector Similarity (providing local SQLite fallback search)
+        \Illuminate\Database\Query\Builder::macro('whereVectorSimilarTo', function (string $column, string $queryText) {
+            if ($this->getConnection()->getDriverName() === 'sqlite') {
+                $keywords = array_filter(explode(' ', $queryText), fn($k) => strlen($k) > 3);
+                if (!empty($keywords)) {
+                    return $this->where(function ($query) use ($keywords) {
+                        foreach ($keywords as $keyword) {
+                            $query->orWhere('content', 'like', '%' . $keyword . '%');
+                        }
+                    });
+                }
+                return $this;
+            }
+            return $this->where($column, 'similar', $queryText);
+        });
+
+        // Laravel 13 Stringable Macro for toEmbeddings (providing fallback when AI package is not active/installed)
+        if (!\Illuminate\Support\Stringable::hasMacro('toEmbeddings')) {
+            \Illuminate\Support\Stringable::macro('toEmbeddings', function (...$args) {
+                return array_map(fn() => rand(-100, 100) / 1000, range(1, 1536));
+            });
+        }
     }
 }

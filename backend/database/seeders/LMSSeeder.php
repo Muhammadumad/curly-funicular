@@ -125,7 +125,7 @@ class LMSSeeder extends Seeder
                 $parts = explode(':', $lessonData['duration']);
                 $durationInSeconds = (int)$parts[0] * 60 + (int)($parts[1] ?? 0);
 
-                Lesson::updateOrCreate(
+                $lesson = Lesson::updateOrCreate(
                     [
                         'course_id' => $course->id,
                         'title' => $lessonData['title']
@@ -137,6 +137,16 @@ class LMSSeeder extends Seeder
                         'order_sequence' => $lessonSeq + 1,
                     ]
                 );
+
+                if ($lessonData['id'] === 'day-1') {
+                    $ingestionService = new \App\Services\Video\TranscriptIngestionService();
+                    $ingestionService->ingest($lesson->id, 
+                        "[00:10] Today we discuss modern web application security.\n" .
+                        "[01:15] Why do we use Sanctum here instead of Passport for SPA token auth?\n" .
+                        "[02:30] Passport is a heavy OAuth2 package, while Sanctum provides cookie-based session guards.\n" .
+                        "[03:45] Let us write some API routes using Sanctum auth middleware."
+                    );
+                }
             }
         }
     }

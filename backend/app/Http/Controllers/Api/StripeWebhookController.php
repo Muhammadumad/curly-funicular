@@ -42,7 +42,9 @@ class StripeWebhookController extends Controller
             $sessionId = $session->id;
 
             // Idempotency check: prevent duplicate processing
-            $alreadyProcessed = Order::where('stripe_session_id', $sessionId)->exists();
+            $alreadyProcessed = Order::where('stripe_session_id', $sessionId)
+                ->where('status', 'paid')
+                ->exists();
 
             if (!$alreadyProcessed) {
                 // Dispatch asynchronous event

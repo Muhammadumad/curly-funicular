@@ -2,42 +2,20 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+#[Fillable(['name', 'email', 'password', 'role', 'is_suspended', 'is_active', 'enrolled_at'])]
+#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
-        'is_suspended',
-        'is_active',
-        'enrolled_at',
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
 
     /**
      * Get the attributes that should be cast.
@@ -97,5 +75,21 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin'; // Kept safely inside the class methods
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::updated(function (User $user) {
+            $cacheStore = \Illuminate\Support\Facades\Cache::store();
+            $supportsTags = method_exists($cacheStore, 'tags');
+            if ($supportsTags) {
+                \Illuminate\Support\Facades\Cache::tags(['user_'.$user->id])->flush();
+            } else {
+                \Illuminate\Support\Facades\Cache::forget("user_session_valid_{$user->id}");
+            }
+        });
     }
 }

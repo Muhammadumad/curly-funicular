@@ -13,7 +13,8 @@ import {
   Award,
   CheckCircle2,
   Play,
-  BookOpen
+  BookOpen,
+  Check
 } from 'lucide-react';
 
 const MODULE_COLORS = [
@@ -436,7 +437,32 @@ export default function Dashboard() {
                             <div className="p-5 flex-1 flex flex-col justify-between">
                               <div>
                                 <h3 className={`font-bold text-sm mb-1.5 ${colors.iconColor} leading-tight`}>{mod.title}</h3>
-                                <p className="text-xs text-slate-500 mb-4 font-medium">{(mod.lessons || []).length} lessons · {mod.duration}</p>
+                                <p className="text-xs text-slate-500 mb-3 font-medium">{(mod.lessons || []).length} lessons · {mod.duration}</p>
+                                
+                                {/* Segmented lists of tutorials inside the 4 modules */}
+                                <div className="space-y-1.5 mt-3 mb-4 max-h-44 overflow-y-auto pr-1">
+                                  {(mod.lessons || []).map((lesson, idx) => {
+                                    const isCompleted = completedLessons.includes(lesson.id) || completedLessons.includes(String(lesson.id));
+                                    return (
+                                      <div
+                                        key={lesson.id}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          navigate(`/classroom/${lesson.id}`);
+                                        }}
+                                        className="flex items-center justify-between text-[11px] font-bold text-slate-500 hover:text-indigo-600 transition-colors py-1 border-b border-slate-50 last:border-b-0"
+                                      >
+                                        <span className="truncate flex items-center gap-1">
+                                          <span className="text-slate-400 font-mono text-[9px]">{idx + 1}.</span>
+                                          <span className="truncate">{lesson.title}</span>
+                                        </span>
+                                        {isCompleted && (
+                                          <Check size={10} className="text-emerald-500 stroke-[3.5] shrink-0" />
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               </div>
                               <div className="space-y-3 pt-3 border-t border-slate-100">
                                 <div className="flex items-center justify-between">

@@ -29,6 +29,7 @@ Route::middleware('throttle:api')->group(function (): void {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::get('/courses', [CourseController::class, 'index']);
     Route::get('/courses/{slug}', [CourseController::class, 'show']);
+    Route::get('/classroom/{lessonId}/stream', [CourseController::class, 'streamVideo'])->name('classroom.video.stream');
     Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
     Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
     Route::post('/webhooks/paddle', [\App\Http\Controllers\Api\PaddleWebhookController::class, 'handle']);
@@ -40,8 +41,10 @@ Route::middleware('throttle:api')->group(function (): void {
         Route::get('/user', [AuthController::class, 'user']);
 
         // Progress tracking & Analytics
-        Route::post('/progress/ping', [ActivityLogController::class, 'updateProgress']);
+        Route::post('/progress/ping', [ActivityLogController::class, 'updateProgress'])->middleware('verify_progress_ping');
         Route::get('/courses/{slug}/progress', [CourseController::class, 'getProgress']);
+        Route::get('/classroom/{lessonId}', [CourseController::class, 'getClassroomLesson']);
+        Route::post('/classroom/{lessonId}/copilot', [CourseController::class, 'askCopilot']);
 
         // Checkout session
         Route::post('/checkout/session', [\App\Http\Controllers\Api\CheckoutController::class, 'createSession']);

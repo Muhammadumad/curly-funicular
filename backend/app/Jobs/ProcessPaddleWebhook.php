@@ -89,12 +89,11 @@ class ProcessPaddleWebhook implements ShouldQueue
             // Update or create order to paid
             Order::updateOrCreate(
                 [
-                    'gateway_transaction_id' => $transactionId,
+                    'stripe_session_id' => $transactionId,
                 ],
                 [
                     'user_id' => $user->id,
-                    'gateway' => 'paddle',
-                    'amount' => $amount,
+                    'amount_total' => $amount,
                     'currency' => $currency,
                     'status' => 'paid',
                 ]
@@ -105,12 +104,11 @@ class ProcessPaddleWebhook implements ShouldQueue
             // Update order to failed
             Order::updateOrCreate(
                 [
-                    'gateway_transaction_id' => $transactionId,
+                    'stripe_session_id' => $transactionId,
                 ],
                 [
                     'user_id' => $user->id,
-                    'gateway' => 'paddle',
-                    'amount' => $amount,
+                    'amount_total' => $amount,
                     'currency' => $currency,
                     'status' => 'failed',
                 ]

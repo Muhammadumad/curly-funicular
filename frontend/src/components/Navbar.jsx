@@ -49,14 +49,14 @@ export default function Navbar() {
         {navLinks.map((link) => {
           const isActive = location.pathname === link.path;
           return (
-            <Link
+             <Link
               key={link.path}
               to={link.path}
-              className={`flex items-center gap-2 text-[16px] font-bold tracking-wide transition-colors duration-200 ${
-                isActive ? 'text-indigo-600' : 'text-slate-600 hover:text-slate-900'
+              className={`flex items-center gap-2 text-[16px] font-bold tracking-wide transition-colors duration-200 font-label ${
+                isActive ? 'text-primary' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <link.icon size={20} className={isActive ? "text-indigo-500" : "text-slate-400"} />
+              <link.icon size={20} className={isActive ? "text-primary" : "text-slate-400"} />
               <span>{link.name}</span>
             </Link>
           );
@@ -71,7 +71,7 @@ export default function Navbar() {
         <div className="relative pointer-events-auto">
           <button 
             onClick={() => setSearchOpen(!searchOpen)}
-            className={`transition-colors ${searchOpen ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-900'}`} 
+            className={`transition-colors ${searchOpen ? 'text-primary' : 'text-slate-500 hover:text-slate-900'}`} 
             title="Search catalog"
           >
             <Search size={18} strokeWidth={2.5} />
@@ -84,88 +84,88 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 15, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="absolute right-0 mt-5 w-[360px] bg-[#110c2e]/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.4)] p-5 flex flex-col z-50 overflow-hidden"
+                className="absolute right-0 mt-5 w-[360px] bg-white/80 backdrop-blur-[20px] rounded-md shadow-lg p-5 flex flex-col z-50 overflow-hidden"
               >
                 {/* Search Input Field */}
-                <div className="flex items-center gap-3 bg-white/5 border border-indigo-500/30 rounded-full px-4 py-2.5 w-full transition-colors focus-within:border-indigo-500/70 focus-within:bg-white/10 shadow-inner shadow-white/5">
-                  <Search size={16} className="text-indigo-400" />
+                <div className="flex items-center gap-3 bg-white border border-ghost-border rounded-md px-4 py-2.5 w-full transition-colors focus-within:border-primary">
+                  <Search size={16} className="text-primary" />
                   <input 
                     type="text" 
                     placeholder="Search" 
                     autoFocus
-                    className="bg-transparent border-none outline-none text-sm text-slate-200 placeholder:text-slate-500 w-full font-medium"
+                    className="bg-transparent border-none outline-none text-sm text-slate-950 placeholder:text-slate-400 w-full font-medium"
                   />
                 </div>
 
-                {/* Quick Links */}
+                 {/* Quick Links */}
                 <div className="mt-6 flex flex-col">
                   <div className="flex items-center">
-                    <span className="text-[11px] font-bold tracking-widest text-slate-400 mb-3 px-1">QUICK LINKS</span>
-                    <div className="h-[1px] bg-white/10 flex-grow ml-3"></div>
+                    <span className="text-[11px] font-bold tracking-widest text-slate-500 mb-3 px-1 font-label">QUICK LINKS</span>
+                    <div className="h-[1px] bg-slate-200 flex-grow ml-3"></div>
                   </div>
                   
                   <div className="flex flex-col gap-1">
-                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 rounded-2xl transition-all duration-200">
+                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center justify-between group cursor-pointer hover:bg-surface-container p-2 rounded-md transition-all duration-200">
                       <div className="flex items-center gap-3">
-                        <div className="bg-cyan-500/20 p-2 rounded-full text-cyan-400 group-hover:scale-110 group-hover:bg-cyan-500/30 transition-all duration-300">
+                        <div className="bg-primary/10 p-2 rounded-md text-primary group-hover:scale-110 transition-all duration-300">
                           <Code size={16} />
                         </div>
-                        <span className="text-[13px] font-semibold text-slate-300 group-hover:text-white transition-colors">Level 1: AI Survival</span>
+                        <span className="text-[13px] font-semibold text-slate-800 group-hover:text-primary transition-colors font-sans">Level 1: AI Survival</span>
                       </div>
-                      <span className="text-[10px] text-slate-400 font-semibold px-2.5 py-1 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">Module</span>
+                      <span className="text-[10px] text-slate-600 font-semibold px-2.5 py-1 rounded-md bg-surface-container-low transition-colors font-label">Module</span>
                     </Link>
-
-                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 rounded-2xl transition-all duration-200">
+ 
+                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center justify-between group cursor-pointer hover:bg-surface-container p-2 rounded-md transition-all duration-200">
                       <div className="flex items-center gap-3">
-                        <div className="bg-emerald-500/20 p-2 rounded-full text-emerald-400 group-hover:scale-110 group-hover:bg-emerald-500/30 transition-all duration-300">
+                        <div className="bg-primary/10 p-2 rounded-md text-primary group-hover:scale-110 transition-all duration-300">
                           <Code size={16} />
                         </div>
-                        <span className="text-[13px] font-semibold text-slate-300 group-hover:text-white transition-colors">Level 2: AI Professional</span>
+                        <span className="text-[13px] font-semibold text-slate-800 group-hover:text-primary transition-colors font-sans">Level 2: AI Professional</span>
                       </div>
-                      <span className="text-[10px] text-slate-400 font-semibold px-2.5 py-1 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">Module</span>
+                      <span className="text-[10px] text-slate-600 font-semibold px-2.5 py-1 rounded-md bg-surface-container-low transition-colors font-label">Module</span>
                     </Link>
-
-                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 rounded-2xl transition-all duration-200">
+ 
+                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center justify-between group cursor-pointer hover:bg-surface-container p-2 rounded-md transition-all duration-200">
                       <div className="flex items-center gap-3">
-                        <div className="bg-blue-500/20 p-2 rounded-full text-blue-400 group-hover:scale-110 group-hover:bg-blue-500/30 transition-all duration-300">
+                        <div className="bg-primary/10 p-2 rounded-md text-primary group-hover:scale-110 transition-all duration-300">
                           <Code size={16} />
                         </div>
-                        <span className="text-[13px] font-semibold text-slate-300 group-hover:text-white transition-colors">Level 3: AI Creator</span>
+                        <span className="text-[13px] font-semibold text-slate-800 group-hover:text-primary transition-colors font-sans">Level 3: AI Creator</span>
                       </div>
-                      <span className="text-[10px] text-slate-400 font-semibold px-2.5 py-1 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">Module</span>
+                      <span className="text-[10px] text-slate-600 font-semibold px-2.5 py-1 rounded-md bg-surface-container-low transition-colors font-label">Module</span>
                     </Link>
                     
-                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 rounded-2xl transition-all duration-200">
+                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center justify-between group cursor-pointer hover:bg-surface-container p-2 rounded-md transition-all duration-200">
                       <div className="flex items-center gap-3">
-                        <div className="bg-amber-500/20 p-2 rounded-full text-amber-400 group-hover:scale-110 group-hover:bg-amber-500/30 transition-all duration-300">
+                        <div className="bg-primary/10 p-2 rounded-md text-primary group-hover:scale-110 transition-all duration-300">
                           <PenTool size={16} />
                         </div>
-                        <span className="text-[13px] font-semibold text-slate-300 group-hover:text-white transition-colors">Level 4: AI Automator</span>
+                        <span className="text-[13px] font-semibold text-slate-800 group-hover:text-primary transition-colors font-sans">Level 4: AI Automator</span>
                       </div>
-                      <span className="text-[10px] text-slate-400 font-semibold px-2.5 py-1 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">Module</span>
+                      <span className="text-[10px] text-slate-600 font-semibold px-2.5 py-1 rounded-md bg-surface-container-low transition-colors font-label">Module</span>
                     </Link>
                   </div>
                 </div>
-
+ 
                 {/* Suggested Search */}
                 <div className="mt-5 flex flex-col">
                   <div className="flex items-center">
-                    <span className="text-[11px] font-bold tracking-widest text-slate-400 mb-3 px-1">SUGGESTED SEARCH</span>
-                    <div className="h-[1px] bg-white/10 flex-grow ml-3"></div>
+                    <span className="text-[11px] font-bold tracking-widest text-slate-500 mb-3 px-1 font-label">SUGGESTED SEARCH</span>
+                    <div className="h-[1px] bg-slate-200 flex-grow ml-3"></div>
                   </div>
-
+ 
                   <div className="flex flex-col gap-1">
-                    <Link to="/" onClick={() => setSearchOpen(false)} className="flex items-center gap-4 group cursor-pointer hover:bg-white/5 p-2.5 rounded-2xl transition-all duration-200">
-                      <LayoutList size={18} className="text-slate-400 group-hover:text-indigo-400 transition-colors" />
-                      <span className="text-[13px] font-semibold text-slate-300 group-hover:text-white transition-colors">Home</span>
+                    <Link to="/" onClick={() => setSearchOpen(false)} className="flex items-center gap-4 group cursor-pointer hover:bg-surface-container p-2.5 rounded-md transition-all duration-200">
+                      <LayoutList size={18} className="text-slate-500 group-hover:text-primary transition-colors" />
+                      <span className="text-[13px] font-semibold text-slate-800 group-hover:text-primary transition-colors font-sans">Home</span>
                     </Link>
-                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center gap-4 group cursor-pointer hover:bg-white/5 p-2.5 rounded-2xl transition-all duration-200">
-                      <Play size={18} className="text-slate-400 group-hover:text-fuchsia-400 transition-colors" />
-                      <span className="text-[13px] font-semibold text-slate-300 group-hover:text-white transition-colors">Classroom</span>
+                    <Link to="/classroom" onClick={() => setSearchOpen(false)} className="flex items-center gap-4 group cursor-pointer hover:bg-surface-container p-2.5 rounded-md transition-all duration-200">
+                      <Play size={18} className="text-slate-500 group-hover:text-primary transition-colors" />
+                      <span className="text-[13px] font-semibold text-slate-800 group-hover:text-primary transition-colors font-sans">Classroom</span>
                     </Link>
-                    <Link to="/pricing" onClick={() => setSearchOpen(false)} className="flex items-center gap-4 group cursor-pointer hover:bg-white/5 p-2.5 rounded-2xl transition-all duration-200">
-                      <CreditCard size={18} className="text-slate-400 group-hover:text-cyan-400 transition-colors" />
-                      <span className="text-[13px] font-semibold text-slate-300 group-hover:text-white transition-colors">Pricing</span>
+                    <Link to="/pricing" onClick={() => setSearchOpen(false)} className="flex items-center gap-4 group cursor-pointer hover:bg-surface-container p-2.5 rounded-md transition-all duration-200">
+                      <CreditCard size={18} className="text-slate-500 group-hover:text-primary transition-colors" />
+                      <span className="text-[13px] font-semibold text-slate-800 group-hover:text-primary transition-colors font-sans">Pricing</span>
                     </Link>
                   </div>
                 </div>

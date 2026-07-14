@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['title', 'slug', 'description', 'price', 'is_published'])]
 class Course extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['title', 'slug', 'description', 'price', 'is_published'];
 
     /**
      * Get all lessons belonging to this AI course, sorted by sequence order.

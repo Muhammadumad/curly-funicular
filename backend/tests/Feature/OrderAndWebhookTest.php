@@ -62,7 +62,7 @@ class OrderAndWebhookTest extends TestCase
         // Assert pending order was created
         $this->assertDatabaseHas('orders', [
             'user_id' => $this->user->id,
-            'amount' => 99.00,
+            'amount_total' => 99.00,
             'status' => 'pending',
         ]);
     }
@@ -118,17 +118,13 @@ class OrderAndWebhookTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /**
-     * Test webhook job processing and idempotency.
-     */
     public function test_webhook_job_execution_and_idempotency(): void
     {
         // 1. Create a pending order first
         $order = Order::create([
             'user_id' => $this->user->id,
-            'gateway' => 'paddle',
-            'gateway_transaction_id' => 'trn_test123456',
-            'amount' => 99.00,
+            'stripe_session_id' => 'trn_test123456',
+            'amount_total' => 99.00,
             'currency' => 'USD',
             'status' => 'pending',
         ]);
@@ -155,7 +151,7 @@ class OrderAndWebhookTest extends TestCase
 
         // Check it was marked as paid
         $this->assertDatabaseHas('orders', [
-            'gateway_transaction_id' => 'trn_test123456',
+            'stripe_session_id' => 'trn_test123456',
             'status' => 'paid',
         ]);
 
@@ -164,7 +160,7 @@ class OrderAndWebhookTest extends TestCase
         $job2->handle();
 
         // Assert we still have exactly 1 order (deduplicated/idempotent)
-        $this->assertEquals(1, Order::where('gateway_transaction_id', 'trn_test123456')->count());
-        $this->assertEquals('paid', Order::where('gateway_transaction_id', 'trn_test123456')->first()->status);
+        $this->assertEquals(1, Order::where('stripe_session_id', 'trn_test123456')->count());
+        $this->assertEquals('paid', Order::where('stripe_session_id', 'trn_test123456')->first()->status);
     }
 }
